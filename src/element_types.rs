@@ -5,41 +5,49 @@ pub enum CapacitorType {
 }
 
 pub enum PackageType {
-    SMD(SMDPackages),
-    THT(THTPackages),
+    SMD,
+    THT,
 }
 
-pub enum SMDPackages {
-    T0603,
-    T0804,
-}
-
-pub enum THTPackages {
-    Axial,
-    DIP8,
-    DIP10,
-    DIP14,
+pub enum ElementType {
+    Passive,
+    Analog,
+    Active,
+    Digital,
 }
 
 pub struct Resistor {
     resistance: f32,
     power: f32,
     tolerance: i32,
-    package: PackageType,
+    package_type: PackageType,
+    element_type: ElementType,
 }
 
 impl Resistor {
-    pub fn new(resistance: f32, power: f32, tolerance: i32, package: PackageType) -> Resistor {
+    pub fn new(resistance: f32, power: f32, tolerance: i32, package_type: PackageType) -> Resistor {
         Resistor {
             resistance,
             power,
             tolerance,
-            package,
+            package_type,
+            element_type: ElementType::Passive,
+        }
+    }
+
+    fn get_package_type(package: &PackageType) -> &'static str {
+        match package {
+            PackageType::THT => "THT",
+            PackageType::SMD => "SMD",
         }
     }
 
     pub fn print(&self) {
-        println!("Resistor with {} Ohm", self.resistance);
+        let package_name = Resistor::get_package_type(&self.package_type);
+        println!(
+            "Resistor with {} Ω ± {}% in {} package. {} W",
+            self.resistance, self.tolerance, package_name, self.power
+        );
     }
 }
 
