@@ -4,12 +4,12 @@ This is a CLI program that can help you keeping track of your electronic compone
 It can distinguish between various packages, component types and placement types.
 
 Currently supported parts are:
-- resistors
-- capacitors
-- inductors
+- resistors ─⊏⊐─
+- capacitors ─┤├─
+- inductors ─⅏─
 
 Planned components in the future:
-- diodes
+- diodes ─▷├─, ─▷│⭧⭧─
 - transistors
-- opamps
-- digital chips
+- opamps ─▶─
+- digital chips 𝍤█𝍤
