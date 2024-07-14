@@ -1,31 +1,48 @@
+use std::str::FromStr;
+
 pub enum CapacitorType {
     Ceramic,
     Electrolytic,
     Tantalum,
 }
 
-pub enum PackageType {
+pub enum Package {
+    Axial,
+    DIP(i32),
+}
+
+impl Package {
+    fn get_name(&self) -> String {
+        match self {
+            Package::Axial => String::from_str("Axial").unwrap(),
+            Package::DIP(number) => String::from_str("DIP-").unwrap() + &number.to_string(),
+        }
+    }
+}
+
+pub enum Mounting {
     SMD,
     THT,
 }
 
-impl PackageType {
+impl Mounting {
     fn get_name(&self) -> &'static str {
         match self {
-            PackageType::SMD => "SMD",
-            PackageType::THT => "THT",
+            Mounting::SMD => "SMD",
+            Mounting::THT => "THT",
         }
     }
 }
 
 pub enum ElementFeature {
-    Resistance,
-    Power,
-    Tolerance,
-    Package,
-    Capacitance,
-    Voltage,
-    Inductance,
+    Resistance(i32),
+    Power(f32),
+    Tolerance(i32),
+    Package(Package),
+    Mounting(Mounting),
+    Capacitance(f32),
+    Voltage(f32),
+    Inductance(f32),
 }
 
 pub enum ElementType {
@@ -36,42 +53,39 @@ pub enum ElementType {
 
 pub trait Element {
     fn print(&self);
+    fn export(&self) -> Vec<String>;
 }
 
 pub struct Resistor {
     resistance: f32,
     power: f32,
     tolerance: i32,
-    package_type: PackageType,
-    element_type: ElementType,
-    features: [ElementFeature; 4],
+    mounting: Mounting,
 }
 
 impl Resistor {
-    pub fn new(resistance: f32, power: f32, tolerance: i32, package_type: PackageType) -> Resistor {
+    pub fn new(resistance: f32, power: f32, tolerance: i32, mounting: Mounting) -> Resistor {
         Resistor {
             resistance,
             power,
             tolerance,
-            package_type,
-            element_type: ElementType::Resistor,
-            features: [
-                ElementFeature::Resistance,
-                ElementFeature::Power,
-                ElementFeature::Tolerance,
-                ElementFeature::Package,
-            ],
+            mounting,
         }
     }
 }
 
 impl Element for Resistor {
     fn print(&self) {
-        let package_name = self.package_type.get_name();
+        let package_name = self.mounting.get_name();
         println!(
             "Resistor ─⊏⊐─ with {} Ω ± {}% in {} package. {} W",
             self.resistance, self.tolerance, package_name, self.power
         );
+    }
+
+    fn export(&self) -> Vec<String> {
+        let vector = vec![1, 2];
+        return vector;
     }
 }
 
@@ -80,37 +94,33 @@ pub struct Capacitor {
     voltage: f32,
     tolerance: i32,
     capacitor_type: CapacitorType,
-    package: PackageType,
-    element_type: ElementType,
-    features: [ElementFeature; 4],
+    mounting: Mounting,
 }
 
 impl Capacitor {
-    pub fn new(capacitance: f32, voltage: f32, tolerance: i32, package: PackageType) -> Capacitor {
+    pub fn new(capacitance: f32, voltage: f32, tolerance: i32, mounting: Mounting) -> Capacitor {
         Capacitor {
             capacitance,
             voltage,
             tolerance,
             capacitor_type: CapacitorType::Ceramic,
-            package,
-            element_type: ElementType::Capacitor,
-            features: [
-                ElementFeature::Capacitance,
-                ElementFeature::Voltage,
-                ElementFeature::Tolerance,
-                ElementFeature::Package,
-            ],
+            mounting,
         }
     }
 }
 
 impl Element for Capacitor {
     fn print(&self) {
-        let package_name = self.package.get_name();
+        let package_name = self.mounting.get_name();
         println!(
             "Capacitor ─┤├─ with {} F ± {}% in {} package. {} V",
             self.capacitance, self.tolerance, package_name, self.voltage
         );
+    }
+
+    fn export(&self) -> Vec<String> {
+        let vector = vec![1, 2];
+        return vector;
     }
 }
 
@@ -118,34 +128,30 @@ pub struct Inductor {
     inductance: f32,
     voltage: f32,
     tolerance: i32,
-    package: PackageType,
-    element_type: ElementType,
-    features: [ElementFeature; 4],
+    mounting: Mounting,
 }
 
 impl Inductor {
-    pub fn new(inductance: f32, voltage: f32, tolerance: i32, package: PackageType) -> Inductor {
+    pub fn new(inductance: f32, voltage: f32, tolerance: i32, mounting: Mounting) -> Inductor {
         Inductor {
             inductance,
             voltage,
             tolerance,
-            package,
-            element_type: ElementType::Inductor,
-            features: [
-                ElementFeature::Resistance,
-                ElementFeature::Power,
-                ElementFeature::Tolerance,
-                ElementFeature::Package,
-            ],
+            mounting,
         }
     }
 }
 impl Element for Inductor {
     fn print(&self) {
-        let package_name = self.package.get_name();
+        let package_name = self.mounting.get_name();
         println!(
             "Inductor ─◠◠─ with {} H ± {}% in {} package. {} V",
             self.inductance, self.tolerance, package_name, self.voltage
         );
+    }
+
+    fn export(&self) -> Vec<String> {
+        let vector = vec![1, 2];
+        return vector;
     }
 }
