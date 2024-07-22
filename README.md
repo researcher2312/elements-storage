@@ -6,10 +6,10 @@ It can distinguish between various packages, component types and placement types
 Currently supported parts are:
 - resistors ─⊏⊐─
 - capacitors ─┤├─
-- inductors ─⅏─
+- inductors ─◠◠─
 
 Planned components in the future:
-- diodes ─▷├─, ─▷│⭧⭧─
-- transistors
+- diodes ─▷├─, ─▷│⭧⭧─, ─▷⌉─, ─▷𝈼─
+- transistors (⊣⥭), (⊣⥪)
 - opamps ─▶─
 - digital chips 𝍤█𝍤

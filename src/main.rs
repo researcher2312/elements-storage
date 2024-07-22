@@ -6,5 +6,9 @@ use element_types::{Element, ElementType};
 
 fn main() {
     let mut storage = ElementStorage::new();
-    storage.add_element(ElementType::Resistor)
+    storage.add_element(ElementType::Resistor);
+    storage.add_element(ElementType::Resistor);
+    storage.add_element(ElementType::Capacitor);
+    storage.add_element(ElementType::Inductor);
+    storage.print_all_elements();
 }
