@@ -55,7 +55,9 @@ pub enum ElementType {
 
 pub trait Element {
     fn print(&self);
-    fn export(&self) -> Vec<String>;
+    fn export(&self) -> Vec<String> {
+        vec![String::from_str("default export").unwrap()]
+    }
 }
 
 pub struct Resistor {
@@ -95,7 +97,12 @@ impl Element for Resistor {
     }
 
     fn export(&self) -> Vec<String> {
-        let vector = vec![1, 2];
+        let vector = vec![
+            self.resistance.to_string(),
+            self.power.to_string(),
+            self.tolerance.to_string(),
+            self.mounting.get_name().to_owned(),
+        ];
         return vector;
     }
 }

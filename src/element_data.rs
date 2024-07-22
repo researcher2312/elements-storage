@@ -1,4 +1,7 @@
 use crate::element_types::*;
+use csv::Writer;
+use std::error::Error;
+use std::fs::File;
 
 pub struct ElementStorage {
     resistors: Vec<Resistor>,
@@ -44,13 +47,13 @@ impl ElementStorage {
         }
     }
 
-    // pub fn export(&self) -> Result<(), Box<dyn Error>> {
-    //     let file_path = "elements.csv";
-    //     let file = File::open(file_path)?;
-    //     let mut writer = Writer::from_writer(file)?;
-    //     for res in &self.resistors {
-    //         writer.write_record(&[res.export()])
-    //     }
-    //     Ok(())
-    // }
+    pub fn export(&self) -> Result<(), Box<dyn Error>> {
+        let file_path = "elements.csv";
+        let file = File::create(file_path)?;
+        let mut writer = Writer::from_writer(file);
+        for res in &self.resistors {
+            writer.write_record(res.export())?
+        }
+        Ok(())
+    }
 }
