@@ -36,6 +36,18 @@ impl Mounting {
     }
 }
 
+impl FromStr for Mounting {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "SMD" => Ok(Mounting::SMD),
+            "THT" => Ok(Mounting::THT),
+            _ => Err(()),
+        }
+    }
+}
+
 pub enum ElementFeature {
     Resistance(i32),
     Power(f32),
@@ -54,10 +66,12 @@ pub enum ElementType {
 }
 
 pub trait Element {
+    fn get_type(&self) -> ElementType;
+    fn get_filename() -> &'static str;
+    fn get_header() -> Vec<&'static str>;
     fn print(&self);
-    fn export(&self) -> Vec<String> {
-        vec![String::from_str("default export").unwrap()]
-    }
+    fn export(&self) -> Vec<String>;
+    fn from_record(record: &csv::StringRecord) -> Self;
 }
 
 pub struct Resistor {
@@ -102,8 +116,31 @@ impl Element for Resistor {
             self.power.to_string(),
             self.tolerance.to_string(),
             self.mounting.get_name().to_owned(),
+            self.package.get_name().to_owned(),
         ];
         return vector;
+    }
+
+    fn get_type(&self) -> ElementType {
+        return ElementType::Resistor;
+    }
+
+    fn get_header() -> Vec<&'static str> {
+        return vec!["resistance", "power", "tolerance", "mounting", "package"];
+    }
+
+    fn get_filename() -> &'static str {
+        return "resistors";
+    }
+
+    fn from_record(record: &csv::StringRecord) -> Resistor {
+        Resistor::new(
+            record[0].parse().unwrap(),
+            record[1].parse().unwrap(),
+            record[2].parse().unwrap(),
+            Mounting::from_str(&record[3]).unwrap(),
+            Package::Axial,
+        )
     }
 }
 
@@ -144,6 +181,39 @@ impl Element for Capacitor {
             self.capacitance, self.tolerance, self.voltage, mounting_name, package_name
         );
     }
+
+    fn get_type(&self) -> ElementType {
+        return ElementType::Capacitor;
+    }
+
+    fn get_filename() -> &'static str {
+        return "capacitors";
+    }
+
+    fn get_header() -> Vec<&'static str> {
+        return vec!["capacitance", "voltage", "tolerance", "mounting", "package"];
+    }
+
+    fn export(&self) -> Vec<String> {
+        let vector = vec![
+            self.capacitance.to_string(),
+            self.voltage.to_string(),
+            self.tolerance.to_string(),
+            self.mounting.get_name().to_owned(),
+            self.package.get_name().to_owned(),
+        ];
+        return vector;
+    }
+
+    fn from_record(record: &csv::StringRecord) -> Capacitor {
+        Capacitor::new(
+            record[0].parse().unwrap(),
+            record[1].parse().unwrap(),
+            record[2].parse().unwrap(),
+            Mounting::from_str(&record[3]).unwrap(),
+            Package::Axial,
+        )
+    }
 }
 
 pub struct Inductor {
@@ -179,5 +249,38 @@ impl Element for Inductor {
             "─◠◠─ {} H ± {}% {} V inductor in {} {} package",
             self.inductance, self.tolerance, self.voltage, mounting_name, package_name
         );
+    }
+
+    fn get_type(&self) -> ElementType {
+        return ElementType::Inductor;
+    }
+
+    fn get_filename() -> &'static str {
+        return "inductors";
+    }
+
+    fn get_header() -> Vec<&'static str> {
+        return vec!["inductance", "voltage", "tolerance", "mounting", "package"];
+    }
+
+    fn export(&self) -> Vec<String> {
+        let vector = vec![
+            self.inductance.to_string(),
+            self.voltage.to_string(),
+            self.tolerance.to_string(),
+            self.mounting.get_name().to_owned(),
+            self.package.get_name().to_owned(),
+        ];
+        return vector;
+    }
+
+    fn from_record(record: &csv::StringRecord) -> Inductor {
+        Inductor::new(
+            record[0].parse().unwrap(),
+            record[1].parse().unwrap(),
+            record[2].parse().unwrap(),
+            Mounting::from_str(&record[3]).unwrap(),
+            Package::Axial,
+        )
     }
 }

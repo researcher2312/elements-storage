@@ -1,59 +1,88 @@
 use crate::element_types::*;
-use csv::Writer;
+use csv::{ReaderBuilder, Writer};
 use std::error::Error;
 use std::fs::File;
+use std::str::FromStr;
+
+pub struct ElementContainer<T: Element> {
+    elements: Vec<T>,
+    filename: String,
+}
+
+impl<T: Element> ElementContainer<T> {
+    pub fn new() -> ElementContainer<T> {
+        ElementContainer {
+            elements: Vec::new(),
+            filename: format!("{}.csv", T::get_filename()),
+        }
+    }
+
+    pub fn add_element(&mut self, element: T) {
+        self.elements.push(element);
+    }
+
+    pub fn print_elements(&self) {
+        for element in &self.elements {
+            element.print();
+        }
+    }
+
+    pub fn export(&self) -> Result<(), Box<dyn Error>> {
+        let file = File::create(&self.filename)?;
+        let mut writer = Writer::from_writer(file);
+        writer.write_record(T::get_header())?;
+        for res in &self.elements {
+            writer.write_record(res.export())?
+        }
+        Ok(())
+    }
+
+    pub fn load(&mut self) {
+        let file_path = format!("{}.csv", T::get_filename());
+        match File::open(file_path) {
+            Err(_) => return,
+            Ok(file) => {
+                let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
+                for record in reader.records() {
+                    let record = record.unwrap();
+                    let elem = T::from_record(&record);
+                    self.add_element(elem);
+                }
+            }
+        }
+    }
+}
 
 pub struct ElementStorage {
-    resistors: Vec<Resistor>,
-    capacitors: Vec<Capacitor>,
-    inductors: Vec<Inductor>,
+    resistors: ElementContainer<Resistor>,
+    capacitors: ElementContainer<Capacitor>,
+    inductors: ElementContainer<Inductor>,
 }
 
 impl ElementStorage {
     pub fn new() -> ElementStorage {
         ElementStorage {
-            resistors: Vec::new(),
-            capacitors: Vec::new(),
-            inductors: Vec::new(),
-        }
-    }
-
-    pub fn add_element(&mut self, element_type: ElementType) {
-        match element_type {
-            ElementType::Resistor => {
-                self.resistors
-                    .push(Resistor::new(10.0, 0.25, 5, Mounting::THT, Package::Axial));
-            }
-            ElementType::Capacitor => {
-                self.capacitors
-                    .push(Capacitor::new(20.0, 5.0, 2, Mounting::THT, Package::Axial));
-            }
-            ElementType::Inductor => {
-                self.inductors
-                    .push(Inductor::new(15.0, 3.0, 4, Mounting::THT, Package::Axial));
-            }
+            resistors: ElementContainer::new(),
+            capacitors: ElementContainer::new(),
+            inductors: ElementContainer::new(),
         }
     }
 
     pub fn print_all_elements(&self) {
-        for element in &self.resistors {
-            element.print();
-        }
-        for element in &self.capacitors {
-            element.print();
-        }
-        for element in &self.inductors {
-            element.print()
-        }
+        self.resistors.print_elements();
+        self.capacitors.print_elements();
+        self.inductors.print_elements();
     }
 
-    pub fn export(&self) -> Result<(), Box<dyn Error>> {
-        let file_path = "elements.csv";
-        let file = File::create(file_path)?;
-        let mut writer = Writer::from_writer(file);
-        for res in &self.resistors {
-            writer.write_record(res.export())?
-        }
-        Ok(())
+    pub fn load(&mut self) {
+        self.resistors.load();
+        self.capacitors.load();
+        self.inductors.load();
+    }
+
+    pub fn export(&self) {
+        self.resistors.export().unwrap();
+        self.capacitors.export().unwrap();
+        self.inductors.export().unwrap();
     }
 }
