@@ -1,8 +1,8 @@
 use crate::element_types::*;
+use crate::unit_manager::UnitValue;
 use csv::{ReaderBuilder, Writer};
 use std::error::Error;
 use std::fs::File;
-use std::str::FromStr;
 
 pub struct ElementContainer<T: Element> {
     elements: Vec<T>,
