@@ -1,6 +1,8 @@
 use crate::element_types::*;
 use crate::unit_manager::UnitValue;
 use csv::{ReaderBuilder, Writer};
+use cursive::CursiveRunnable;
+use cursive::views::{SelectView, TextView};
 use std::error::Error;
 use std::fs::File;
 
@@ -9,7 +11,7 @@ pub struct ElementContainer<T: Element> {
     filename: String,
 }
 
-impl<T: Element> ElementContainer<T> {
+impl<T: Element + std::fmt::Debug> ElementContainer<T> {
     pub fn new() -> ElementContainer<T> {
         ElementContainer {
             elements: Vec::new(),
@@ -25,6 +27,14 @@ impl<T: Element> ElementContainer<T> {
         for element in &self.elements {
             element.print();
         }
+    }
+
+    fn display_on_list(&self, siv: &mut CursiveRunnable) {
+        let mut list = SelectView::new();
+        for element in &self.elements {
+            list.add_item_str(format!("{:?}", element));
+        }
+        siv.add_layer(list);
     }
 
     pub fn export(&self) -> Result<(), Box<dyn Error>> {
@@ -72,6 +82,10 @@ impl ElementStorage {
         self.resistors.print_elements();
         self.capacitors.print_elements();
         self.inductors.print_elements();
+    }
+
+    pub fn display_on_list(&self, siv: &mut CursiveRunnable) {
+        self.resistors.display_on_list(siv);
     }
 
     pub fn load(&mut self) {

@@ -10,7 +10,7 @@ pub enum Unit {
 impl Unit {
     fn to_str(&self) -> &'static str {
         match self {
-            Unit::Ohm => "om",
+            Unit::Ohm => "Ω",
             Unit::Farad => "F",
             Unit::Henr => "H",
             Unit::Volt => "V",

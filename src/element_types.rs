@@ -1,11 +1,15 @@
+use crate::unit_manager::UnitValue;
+
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub enum CapacitorType {
     Ceramic,
     Electrolytic,
     Tantalum,
 }
 
+#[derive(Debug)]
 pub enum Package {
     Axial,
     DIP(i32),
@@ -22,6 +26,7 @@ impl Package {
     }
 }
 
+#[derive(Debug)]
 pub enum Mounting {
     SMD,
     THT,
@@ -49,14 +54,14 @@ impl FromStr for Mounting {
 }
 
 pub enum ElementFeature {
-    Resistance(i32),
-    Power(f32),
+    Resistance(UnitValue),
+    Power(UnitValue),
     Tolerance(i32),
     Package(Package),
     Mounting(Mounting),
-    Capacitance(f32),
-    Voltage(f32),
-    Inductance(f32),
+    Capacitance(UnitValue),
+    Voltage(UnitValue),
+    Inductance(UnitValue),
 }
 
 pub enum ElementType {
@@ -74,6 +79,7 @@ pub trait Element {
     fn from_record(record: &csv::StringRecord) -> Self;
 }
 
+#[derive(Debug)]
 pub struct Resistor {
     resistance: f32,
     power: f32,
@@ -144,6 +150,7 @@ impl Element for Resistor {
     }
 }
 
+#[derive(Debug)]
 pub struct Capacitor {
     capacitance: f32,
     voltage: f32,
@@ -202,7 +209,7 @@ impl Element for Capacitor {
             self.mounting.get_name().to_owned(),
             self.package.get_name().to_owned(),
         ];
-        return vector;
+        vector
     }
 
     fn from_record(record: &csv::StringRecord) -> Capacitor {
@@ -216,6 +223,7 @@ impl Element for Capacitor {
     }
 }
 
+#[derive(Debug)]
 pub struct Inductor {
     inductance: f32,
     voltage: f32,
