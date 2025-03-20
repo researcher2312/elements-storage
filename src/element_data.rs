@@ -1,9 +1,8 @@
 use crate::element_types::*;
 use crate::unit_manager::UnitValue;
 use csv::{ReaderBuilder, Writer};
-use cursive::CursiveRunnable;
-use cursive::views::{SelectView, TextView};
 use std::error::Error;
+use std::fmt::format;
 use std::fs::File;
 
 pub struct ElementContainer<T: Element> {
@@ -29,12 +28,9 @@ impl<T: Element + std::fmt::Debug> ElementContainer<T> {
         }
     }
 
-    fn display_on_list(&self, siv: &mut CursiveRunnable) {
-        let mut list = SelectView::new();
-        for element in &self.elements {
-            list.add_item_str(format!("{:?}", element));
-        }
-        siv.add_layer(list);
+    pub fn get_elements_as_text(&self) -> String {
+        let iter = self.elements.iter().map(|e| format!("{:?}", e));
+        iter.collect::<Vec<String>>().join("\n")
     }
 
     pub fn export(&self) -> Result<(), Box<dyn Error>> {
@@ -81,10 +77,6 @@ impl ElementStorage {
         self.inductors.print_elements();
     }
 
-    pub fn display_on_list(&self, siv: &mut CursiveRunnable) {
-        self.resistors.display_on_list(siv);
-    }
-
     pub fn load(&mut self) {
         self.resistors.load();
         self.capacitors.load();
@@ -95,5 +87,9 @@ impl ElementStorage {
         self.resistors.export().unwrap();
         self.capacitors.export().unwrap();
         self.inductors.export().unwrap();
+    }
+
+    pub fn get_resistors(self) -> String {
+        self.resistors.get_elements_as_text()
     }
 }

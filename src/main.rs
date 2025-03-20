@@ -3,19 +3,22 @@ mod element_data;
 mod element_types;
 mod unit_manager;
 
-use cursive::views::{Dialog, ListView, TextView};
 use element_data::ElementStorage;
+use iocraft::prelude::*;
 
 fn main() {
     let mut storage = ElementStorage::new();
     storage.load();
-    storage.print_all_elements();
     storage.export();
 
-    let mut siv = cursive::default();
+    let mut elem = element! {
+        View(
+            border_style: BorderStyle::Round,
+            border_color: Color::Blue,
+        ) {
+            Text(content: storage.get_resistors())
+        }
+    };
 
-    storage.display_on_list(&mut siv);
-
-    // Starts the event loop.
-    siv.run();
+    smol::block_on(elem.render_loop()).unwrap()
 }
