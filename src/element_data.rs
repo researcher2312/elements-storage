@@ -49,15 +49,12 @@ impl<T: Element + std::fmt::Debug> ElementContainer<T> {
 
     pub fn load(&mut self) {
         let file_path = format!("{}.csv", T::get_filename());
-        match File::open(file_path) {
-            Err(_) => return,
-            Ok(file) => {
-                let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
-                for record in reader.records() {
-                    let record = record.unwrap();
-                    let elem = T::from_record(&record);
-                    self.add_element(elem);
-                }
+        if let Ok(file) = File::open(file_path) {
+            let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
+            for record in reader.records() {
+                let record = record.unwrap();
+                let elem = T::from_record(&record);
+                self.add_element(elem);
             }
         }
     }
